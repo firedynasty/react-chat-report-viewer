@@ -1,25 +1,40 @@
-// Vercel Serverless Function for OpenAI Chat
-// Environment variables (set in Vercel dashboard):
+// Netlify Serverless Function for OpenAI Chat
+// Environment variables (set in Netlify dashboard):
 // - OPENAI_API_KEY: Your OpenAI API key (server-side only, NOT exposed to client)
-// - ACCESS_CODE: Password users must enter to use Stanley's key
+// - ACCESS_CODE: Password users must enter to use the shared key
 
-export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+const headers = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+};
 
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+exports.handler = async (event, context) => {
+  // Handle CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
   }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ error: 'Method not allowed' }),
+    };
   }
 
-  const { messages, model, accessCode, userApiKey, webSearch } = req.body;
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ error: 'Invalid JSON body' }),
+    };
+  }
+
+  const { messages, model, accessCode, userApiKey, webSearch } = body;
 
   // Determine which API key to use
   let apiKey;
@@ -28,18 +43,30 @@ export default async function handler(req, res) {
     // User provided their own API key
     apiKey = userApiKey;
   } else if (accessCode) {
-    // User wants to use Stanley's key - validate access code
+    // User wants to use shared key - validate access code
     const validAccessCode = process.env.ACCESS_CODE;
     if (accessCode !== validAccessCode) {
-      return res.status(401).json({ error: 'Invalid access code' });
+      return {
+        statusCode: 401,
+        headers,
+        body: JSON.stringify({ error: 'Invalid access code' }),
+      };
     }
     apiKey = process.env.OPENAI_API_KEY;
   } else {
-    return res.status(400).json({ error: 'No API key or access code provided' });
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ error: 'No API key or access code provided' }),
+    };
   }
 
   if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'API key not configured' }),
+    };
   }
 
   try {
@@ -134,9 +161,17 @@ export default async function handler(req, res) {
       assistantContent = data.choices[0].message.content;
     }
 
-    return res.status(200).json({ content: assistantContent });
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ content: assistantContent }),
+    };
   } catch (error) {
     console.error('OpenAI API error:', error);
-    return res.status(500).json({ error: error.message || 'Failed to get response from OpenAI' });
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: error.message || 'Failed to get response from OpenAI' }),
+    };
   }
-}
+};
