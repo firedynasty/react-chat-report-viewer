@@ -157,6 +157,22 @@ KEEP RESPONSES SHORT (under 150 words). End with a probing question.`
     return allFileContents[selectedFile];
   };
 
+  // Navigate to next/previous report
+  const navigateReport = (direction) => {
+    if (preloadedFiles.length === 0) return;
+
+    const currentIndex = preloadedFiles.indexOf(selectedFile);
+    let newIndex;
+
+    if (direction === 'next') {
+      newIndex = currentIndex < preloadedFiles.length - 1 ? currentIndex + 1 : 0;
+    } else {
+      newIndex = currentIndex > 0 ? currentIndex - 1 : preloadedFiles.length - 1;
+    }
+
+    setSelectedFile(preloadedFiles[newIndex]);
+  };
+
   // Build system prompt with role and selected file context
   const buildSystemPrompt = () => {
     const parts = [];
@@ -547,6 +563,29 @@ ${fileContent}
             ))}
           </select>
 
+          {/* Navigation buttons */}
+          <div style={styles.navButtons}>
+            <button
+              onClick={() => navigateReport('prev')}
+              style={styles.navBtn}
+              disabled={preloadedFiles.length === 0}
+              title="Previous report"
+            >
+              ◀ Prev
+            </button>
+            <span style={styles.navCounter}>
+              {selectedFile ? `${preloadedFiles.indexOf(selectedFile) + 1}/${preloadedFiles.length}` : `0/${preloadedFiles.length}`}
+            </span>
+            <button
+              onClick={() => navigateReport('next')}
+              style={styles.navBtn}
+              disabled={preloadedFiles.length === 0}
+              title="Next report"
+            >
+              Next ▶
+            </button>
+          </div>
+
           {/* Hidden folder input */}
           <input
             type="file"
@@ -800,6 +839,30 @@ const styles = {
     backgroundColor: '#fff',
     boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
     transition: 'transform 0.3s',
+  },
+  navButtons: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginTop: '8px',
+  },
+  navBtn: {
+    flex: 1,
+    padding: '8px 12px',
+    borderRadius: '6px',
+    border: 'none',
+    fontSize: '12px',
+    fontWeight: '500',
+    background: '#2d2d44',
+    color: '#fff',
+    cursor: 'pointer',
+    transition: 'background 0.2s',
+  },
+  navCounter: {
+    fontSize: '12px',
+    color: '#888',
+    minWidth: '50px',
+    textAlign: 'center',
   },
   checkbox: {
     width: '18px',
