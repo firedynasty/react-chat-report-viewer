@@ -733,6 +733,9 @@ ${userMaterial}
             )}
           </div>
 
+          {/* Spacer for fixed input */}
+          <div style={styles.inputSpacer}></div>
+
           {/* Input Area */}
           <div style={styles.inputArea}>
             <textarea
@@ -948,7 +951,6 @@ const styles = {
     display: 'flex',
     overflow: 'hidden',
     minHeight: 0,
-    marginBottom: '65px',
   },
   chatPanel: {
     flex: 1,
@@ -1047,6 +1049,10 @@ const styles = {
     fontSize: '14px',
     lineHeight: '1.5',
     whiteSpace: 'pre-wrap',
+  },
+  inputSpacer: {
+    height: '70px',
+    flexShrink: 0,
   },
   inputArea: {
     position: 'fixed',
