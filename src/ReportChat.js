@@ -731,10 +731,9 @@ ${userMaterial}
                 <div style={styles.messageContent}>Thinking...</div>
               </div>
             )}
+            {/* Spacer for fixed input */}
+            <div style={styles.inputSpacer}></div>
           </div>
-
-          {/* Spacer for fixed input */}
-          <div style={styles.inputSpacer}></div>
 
           {/* Input Area */}
           <div style={styles.inputArea}>
@@ -1051,7 +1050,7 @@ const styles = {
     whiteSpace: 'pre-wrap',
   },
   inputSpacer: {
-    height: '70px',
+    height: '100px',
     flexShrink: 0,
   },
   inputArea: {
