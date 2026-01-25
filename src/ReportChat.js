@@ -947,12 +947,15 @@ const styles = {
     flex: 1,
     display: 'flex',
     overflow: 'hidden',
+    minHeight: 0,
   },
   chatPanel: {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
     background: '#fff',
+    minHeight: 0,
+    overflow: 'hidden',
   },
   chatPanelHeader: {
     padding: '15px 20px',
@@ -998,6 +1001,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '16px',
+    minHeight: 0,
   },
   emptyState: {
     display: 'flex',
