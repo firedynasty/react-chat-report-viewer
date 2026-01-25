@@ -948,6 +948,7 @@ const styles = {
     display: 'flex',
     overflow: 'hidden',
     minHeight: 0,
+    marginBottom: '65px',
   },
   chatPanel: {
     flex: 1,
@@ -998,7 +999,6 @@ const styles = {
     flex: 1,
     overflowY: 'auto',
     padding: '20px',
-    paddingBottom: '80px',
     display: 'flex',
     flexDirection: 'column',
     gap: '16px',
