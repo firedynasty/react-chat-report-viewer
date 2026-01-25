@@ -1000,12 +1000,12 @@ const styles = {
     gap: '16px',
   },
   emptyState: {
-    flex: 1,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     color: '#666',
+    padding: '40px 20px',
   },
   emptyTitle: {
     fontSize: '18px',
