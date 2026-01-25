@@ -296,10 +296,21 @@ ${userMaterial}
     return parts.length > 0 ? parts.join('\n\n') : null;
   };
 
+  // Check if running on localhost
+  const isLocalhost = typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
   // Send message to API
   const sendMessage = async () => {
-    const needsApiKey = !(aiProvider === 'ChatGPT' && useSharedKey);
     if (!inputValue.trim()) return;
+
+    // Check if using shared key on localhost (requires vercel dev)
+    if (useSharedKey && isLocalhost) {
+      alert("Stanley's shared key requires 'vercel dev' locally, or use the deployed site. For local development with 'npm start', enter your own API key.");
+      return;
+    }
+
+    const needsApiKey = !(aiProvider === 'ChatGPT' && useSharedKey);
     if (needsApiKey && !apiKey) {
       alert(`Please enter your ${aiProvider === 'ChatGPT' ? 'OpenAI' : 'Anthropic'} API key`);
       return;
