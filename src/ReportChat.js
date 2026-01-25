@@ -691,6 +691,28 @@ ${userMaterial}
                 {useSharedKey ? "✓ Stanley's Key" : "Use Stanley's Key"}
               </button>
             )}
+            {!showSidebar && (
+              <button
+                onClick={async () => {
+                  if (messages.length === 0) {
+                    alert('No messages to copy');
+                    return;
+                  }
+                  const chatText = messages
+                    .map(msg => `${msg.role === 'user' ? 'You' : (aiProvider === 'ChatGPT' ? 'ChatGPT' : 'Claude')}: ${msg.content}`)
+                    .join('\n\n');
+                  try {
+                    await navigator.clipboard.writeText(chatText);
+                    alert('Chat copied!');
+                  } catch (err) {
+                    console.error('Failed to copy:', err);
+                  }
+                }}
+                style={styles.copyBtn}
+              >
+                Copy
+              </button>
+            )}
           </div>
 
           {/* Chat Messages */}
@@ -988,6 +1010,16 @@ const styles = {
     color: '#fff',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
+  },
+  copyBtn: {
+    padding: '6px 12px',
+    borderRadius: '6px',
+    border: 'none',
+    fontSize: '12px',
+    fontWeight: '500',
+    color: '#fff',
+    background: '#6c757d',
+    cursor: 'pointer',
   },
   roleIndicator: {
     fontSize: '12px',
