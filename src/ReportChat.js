@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { marked } from 'marked';
 
 // Convert markdown to plain text
 const md2plain = (md) => {
@@ -33,12 +32,9 @@ const ReportChat = () => {
   const [accessCode, setAccessCode] = useState('');
   const [selectedRole, setSelectedRole] = useState('default');
 
-  // File state
-  const [preloadedFiles, setPreloadedFiles] = useState([]); // list of filenames
-  const [selectedFile, setSelectedFile] = useState('');
-  const [allFileContents, setAllFileContents] = useState({}); // {filename: content}
-  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
-  const [sendAllFiles, setSendAllFiles] = useState(false); // false = current file only, true = all files
+  // User material state
+  const [userMaterial, setUserMaterial] = useState('');
+  const [showMaterialModal, setShowMaterialModal] = useState(false);
 
   // Modal state
   const [showPromptModal, setShowPromptModal] = useState(false);
@@ -50,7 +46,6 @@ const ReportChat = () => {
 
   // Refs
   const chatContainerRef = useRef(null);
-  const folderInputRef = useRef(null);
 
   // Available roles
   const roles = {
@@ -75,6 +70,171 @@ EXAMPLE RESPONSES:
 TONE: Curious, challenging, thought-provoking. Push them to think deeper.
 
 KEEP RESPONSES SHORT (under 150 words). End with a probing question.`
+    },
+    'pride_prejudice_teacher': {
+      name: 'Pride & Prejudice Teacher',
+      prompt: `You are a knowledgeable and engaging English literature teacher specializing in Jane Austen's "Pride and Prejudice."
+
+YOUR ROLE: Help students understand the novel's characters, themes, plot, and historical context. Make the Regency era accessible and the text meaningful.
+
+TEACHING STYLE:
+- Explain concepts clearly with examples from the text
+- Connect themes to the plot events
+- Help students see both what Austen critiques AND what she celebrates
+- Encourage deeper reading beyond surface plot
+- Cite specific chapters/scenes when helpful
+
+---
+
+REFERENCE MATERIAL:
+
+## Chapter Summaries
+
+### Chapter 1 & 2
+The news that a wealthy young gentleman named Charles Bingley has rented the manor known as Netherfield Park causes a great stir in the neighboring village of Longbourn, especially in the Bennet household. The Bennets have five unmarried daughters, and Mrs. Bennet, a foolish and fussy gossip, is the sort who agrees with the novel's opening words: "It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife." She sees Bingley's arrival as an opportunity for one of the girls to obtain a wealthy spouse.
+
+### Chapter 3 & 4
+Mr. Bingley and his guests go to a ball in Meryton. Jane dances twice with Bingley. Darcy refuses to dance with Elizabeth, saying, "she is tolerable, but not handsome enough to tempt me." Elizabeth takes an immediate disliking to Darcy. The neighborhood declares Bingley "amiable" but finds Darcy too proud.
+
+### Chapters 5 & 6
+Charlotte Lucas is Elizabeth's closest friend. Darcy finds himself attracted to Elizabeth and begins listening to her conversations at parties. At the Lucas house, Sir William attempts to persuade Elizabeth and Darcy to dance together, but Elizabeth refuses.
+
+### Chapters 7 & 8
+Mr. Bennet's property is entailed—it must pass to a man after his death. Jane is invited to Netherfield, falls ill, and must stay there. Elizabeth visits on foot, arriving with soaked and dirty stockings. Darcy admits the Bennets' lack of wealth makes them poor marriage prospects.
+
+### Chapters 9 & 10
+Mrs. Bennet visits and makes a fool of herself. Miss Bingley observes Darcy's attraction to Elizabeth and becomes jealous.
+
+### Chapters 11 & 12
+Elizabeth monopolizes Darcy's attention. Darcy is glad when Elizabeth leaves, as she attracts him "more than he liked," considering her unsuitability for matrimony.
+
+### Chapters 13–15
+Mr. Collins, who will inherit the Bennet estate, arrives. He is a clergyman patronized by Lady Catherine de Bourgh. He fixes his attention on Elizabeth as a potential wife. The sisters meet Mr. Wickham, who is charming. Elizabeth notices Wickham and Darcy are cold to each other.
+
+### Chapters 16 & 17
+Wickham tells Elizabeth that Darcy cheated him out of money meant to provide for him. Elizabeth trusts Wickham immediately and decides Darcy deserves contempt.
+
+### Chapter 18
+Wickham doesn't attend the Netherfield ball. Elizabeth dances awkwardly with Darcy. Miss Bingley warns Elizabeth not to trust Wickham, but Elizabeth ignores her. Mrs. Bennet embarrasses the family at supper.
+
+### Chapters 19–21
+Mr. Collins proposes to Elizabeth; she refuses. Mrs. Bennet is furious. Miss Bingley writes that Bingley's party is returning to London and implies Bingley will marry Darcy's sister Georgiana.
+
+### Chapters 22 & 23
+Mr. Collins proposes to Charlotte Lucas, who accepts. Elizabeth is shocked. Jane's marriage prospects appear limited.
+
+### Chapters 24 & 25
+Mr. Bennet encourages Elizabeth's interest in Wickham. Jane is invited to London by the Gardiners.
+
+### Chapter 26
+Mrs. Gardiner warns Elizabeth that Wickham lacks money. Wickham's attentions shift to Miss King, who has inherited a fortune.
+
+### Chapters 27–29
+Elizabeth visits Charlotte and Mr. Collins. She meets Lady Catherine de Bourgh, who dominates conversation and criticizes the Bennets' upbringing.
+
+### Chapters 30–32
+Darcy and Colonel Fitzwilliam visit Rosings. Darcy visits the parsonage awkwardly. Charlotte thinks he must be in love with Elizabeth.
+
+### Chapters 33 & 34
+Colonel Fitzwilliam mentions Darcy saved a friend from an "imprudent marriage" (Jane and Bingley). Darcy proposes to Elizabeth, dwelling on her social inferiority. Elizabeth angrily refuses, accusing him of sabotaging Jane's romance and mistreating Wickham.
+
+### Chapters 35 & 36
+Darcy gives Elizabeth a letter explaining: he separated Bingley from Jane because Jane's attachment seemed weak; Wickham actually tried to elope with Darcy's sister Georgiana for her fortune. Elizabeth is stunned and begins to reappraise both men.
+
+### Chapters 37–39
+Darcy leaves Rosings. Elizabeth returns home. Lydia is invited to Brighton by Colonel Forster's wife.
+
+### Chapters 40–42
+Elizabeth tells Jane the truth about Wickham. Mr. Bennet allows Lydia to go to Brighton. Elizabeth tours Derbyshire with the Gardiners and agrees to visit Darcy's estate, Pemberley.
+
+### Chapter 43
+At Pemberley, the housekeeper praises Darcy as "the sweetest, most generous-hearted boy" and kindest of masters. Darcy appears and is remarkably polite. He asks Elizabeth to meet his sister Georgiana.
+
+### Chapters 44 & 45
+Darcy and Georgiana visit Elizabeth. Miss Bingley makes a spiteful comment about Wickham. Darcy tells Miss Bingley that Elizabeth is "one of the handsomest women of my acquaintance."
+
+### Chapter 46
+Elizabeth receives letters: Lydia has eloped with Wickham and may not be married. The family's reputation could be ruined. Elizabeth tells Darcy and rushes home.
+
+### Chapters 47–49
+Mr. Gardiner and Mr. Bennet search for Lydia. Eventually Wickham agrees to marry her if the Bennets guarantee him income. The family assumes the Gardiners paid Wickham a large sum.
+
+### Chapters 50 & 51
+Elizabeth realizes she would accept if Darcy proposed again. Lydia visits and mentions Darcy was at the wedding.
+
+### Chapters 52 & 53
+Mrs. Gardiner reveals Darcy found Lydia and Wickham and paid Wickham to marry her—out of love for Elizabeth. Bingley returns to Netherfield with Darcy.
+
+### Chapters 54 & 55
+Bingley proposes to Jane; she accepts.
+
+### Chapter 56
+Lady Catherine demands Elizabeth promise not to marry Darcy. Elizabeth refuses, asserting: "I am resolved to act in that manner which will, in my own opinion, constitute my happiness, without reference to you."
+
+### Chapters 57 & 58
+Darcy proposes again, humbly. Elizabeth accepts, telling him her feelings have changed.
+
+### Chapters 59 & 60
+Elizabeth convinces Jane and Mr. Bennet she truly loves Darcy. Mrs. Bennet is delighted.
+
+### Chapter 61
+Bingley purchases an estate near Pemberley. Kitty matures away from Lydia's influence. Lydia and Wickham remain incorrigible.
+
+---
+
+## CHARACTER LIST
+
+**Elizabeth Bennet** - Protagonist, second eldest daughter. Intelligent, witty, independent-minded, but initially prejudiced against Darcy.
+
+**Fitzwilliam Darcy** - Wealthy gentleman (£10,000/year), master of Pemberley. Initially proud and class-conscious; learns humility.
+
+**Jane Bennet** - Eldest, most beautiful sister. Reserved, gentle, sees the best in everyone.
+
+**Charles Bingley** - Darcy's wealthy friend (£4-5,000/year). Genial, easygoing. Renting Netherfield Park.
+
+**Mr. Bennet** - Sarcastic, intelligent but irresponsible father. Prefers his library to dealing with problems.
+
+**Mrs. Bennet** - Foolish, noisy mother obsessed with marrying off her daughters.
+
+**Lydia Bennet** - Youngest. Immature, reckless. Elopes with Wickham.
+
+**George Wickham** - Charming but deceitful officer. Tried to elope with Georgiana Darcy for her fortune.
+
+**Mr. Collins** - Pompous clergyman who will inherit Bennet estate. Patronized by Lady Catherine.
+
+**Charlotte Lucas** - Elizabeth's pragmatic friend. Marries Collins for security.
+
+**Miss Bingley** - Bingley's snobbish sister. Pursues Darcy, disdains Elizabeth.
+
+**Lady Catherine de Bourgh** - Darcy's domineering aunt. Epitomizes class snobbery.
+
+**Mr. and Mrs. Gardiner** - Mrs. Bennet's sensible brother and wife. Help resolve the Lydia crisis.
+
+---
+
+## KEY THEMES
+
+**Pride and Prejudice**: Darcy's pride in his status; Elizabeth's prejudiced first impressions. Both must overcome these flaws.
+
+**Class and Social Status**: The rigid hierarchy from aristocracy (Darcy) to gentry (Bennets) to trade (Bingleys). The entailment threatens the daughters' futures.
+
+**Marriage and Money**: Charlotte marries for security; Elizabeth holds out for love. The novel validates romantic idealism while acknowledging economic realities.
+
+**Gender Constraints**: Women's limited options—marry well or face poverty and social scorn.
+
+**Personal Growth**: Both protagonists undergo genuine transformation through self-examination.
+
+---
+
+## KEY TURNING POINTS
+
+1. **Meryton Ball** - First impressions: Darcy snubs Elizabeth
+2. **Darcy's First Proposal (Ch. 34)** - He insults her family; she refuses angrily
+3. **Darcy's Letter (Ch. 35-36)** - Reveals truth about Wickham; begins Elizabeth's self-examination
+4. **Pemberley Visit (Ch. 43)** - Elizabeth sees Darcy's true character
+5. **Lydia's Elopement (Ch. 46)** - Crisis that proves Darcy's love
+6. **Lady Catherine's Confrontation (Ch. 56)** - Elizabeth asserts her independence
+7. **Second Proposal (Ch. 58)** - Both have matured; happy resolution`
     },
   };
 
@@ -106,33 +266,6 @@ KEEP RESPONSES SHORT (under 150 words). End with a probing question.`
     }
   }, [aiProvider]);
 
-  // Fetch preloaded files list and contents on mount
-  useEffect(() => {
-    const fetchPreloadedData = async () => {
-      setIsLoadingFiles(true);
-      try {
-        // Fetch index.json for file list
-        const indexResponse = await fetch('/preloaded/index.json');
-        if (indexResponse.ok) {
-          const indexData = await indexResponse.json();
-          setPreloadedFiles(indexData.files || []);
-        }
-
-        // Fetch reports.json for all file contents
-        const reportsResponse = await fetch('/preloaded/reports.json');
-        if (reportsResponse.ok) {
-          const reportsData = await reportsResponse.json();
-          setAllFileContents(reportsData);
-        }
-      } catch (err) {
-        console.log('Error loading preloaded data:', err);
-      } finally {
-        setIsLoadingFiles(false);
-      }
-    };
-    fetchPreloadedData();
-  }, []);
-
   // Auto-scroll chat to bottom when new messages arrive
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -140,40 +273,7 @@ KEEP RESPONSES SHORT (under 150 words). End with a probing question.`
     }
   }, [messages]);
 
-  // Check if file is markdown
-  const isMarkdown = (filename) => {
-    return filename?.toLowerCase().endsWith('.md');
-  };
-
-  // Render markdown content
-  const renderMarkdown = (content) => {
-    if (!content) return '';
-    return marked.parse(content);
-  };
-
-  // Get selected file content
-  const getSelectedFileContent = () => {
-    if (!selectedFile || !allFileContents[selectedFile]) return null;
-    return allFileContents[selectedFile];
-  };
-
-  // Navigate to next/previous report
-  const navigateReport = (direction) => {
-    if (preloadedFiles.length === 0) return;
-
-    const currentIndex = preloadedFiles.indexOf(selectedFile);
-    let newIndex;
-
-    if (direction === 'next') {
-      newIndex = currentIndex < preloadedFiles.length - 1 ? currentIndex + 1 : 0;
-    } else {
-      newIndex = currentIndex > 0 ? currentIndex - 1 : preloadedFiles.length - 1;
-    }
-
-    setSelectedFile(preloadedFiles[newIndex]);
-  };
-
-  // Build system prompt with role and selected file context
+  // Build system prompt with role and user material
   const buildSystemPrompt = () => {
     const parts = [];
 
@@ -183,29 +283,14 @@ KEEP RESPONSES SHORT (under 150 words). End with a probing question.`
       parts.push(rolePrompt);
     }
 
-    // Add file content(s) as context
-    if (sendAllFiles && Object.keys(allFileContents).length > 0) {
-      // Send ALL files concatenated
-      const allFilesContext = Object.entries(allFileContents)
-        .map(([filename, content]) => `--- FILE: ${filename} ---\n${content}`)
-        .join('\n\n---\n\n');
+    // Add user material if provided
+    if (userMaterial.trim()) {
+      const materialContext = `The user has provided the following material for context. Use it to answer questions and provide analysis.
 
-      const fileContext = `You have access to the following ${Object.keys(allFileContents).length} documents. Use them to answer questions and provide analysis.
-
-${allFilesContext}
-`;
-      parts.push(fileContext);
-    } else {
-      // Send only the selected file (default)
-      const fileContent = getSelectedFileContent();
-      if (fileContent) {
-        const fileContext = `You have access to the following document. Use it to answer questions and provide analysis.
-
---- FILE: ${selectedFile} ---
-${fileContent}
-`;
-        parts.push(fileContext);
-      }
+--- USER MATERIAL ---
+${userMaterial}
+--- END MATERIAL ---`;
+      parts.push(materialContext);
     }
 
     return parts.length > 0 ? parts.join('\n\n') : null;
@@ -387,57 +472,16 @@ ${fileContent}
     }
   };
 
-  // Handle folder selection - load .txt and .md files
-  const handleFolderSelect = async (e) => {
-    const files = Array.from(e.target.files);
-
-    // Filter for .txt and .md files only
-    const textFiles = files.filter(file => {
-      const name = file.name.toLowerCase();
-      return name.endsWith('.txt') || name.endsWith('.md');
-    });
-
-    if (textFiles.length === 0) {
-      alert('No .txt or .md files found in the selected folder');
-      return;
-    }
-
-    setIsLoadingFiles(true);
-
-    const newFileContents = {};
-    const newFileNames = [];
-
-    // Read each file
-    for (const file of textFiles) {
-      try {
-        const content = await file.text();
-        newFileContents[file.name] = content;
-        newFileNames.push(file.name);
-      } catch (err) {
-        console.error(`Error reading ${file.name}:`, err);
-      }
-    }
-
-    // Sort filenames alphabetically
-    newFileNames.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
-
-    // Update state
-    setPreloadedFiles(newFileNames);
-    setAllFileContents(newFileContents);
-    setSelectedFile(''); // Reset selection
-    setIsLoadingFiles(false);
-
-    // Reset the input so the same folder can be selected again
-    e.target.value = '';
+  // Clear chat
+  const clearChat = () => {
+    setMessages([]);
   };
-
-  const fileContent = getSelectedFileContent();
 
   return (
     <div style={styles.container}>
       {/* Sidebar */}
       <div style={styles.sidebar}>
-        <h2 style={styles.sidebarTitle}>Report Chat</h2>
+        <h2 style={styles.sidebarTitle}>Role Chat</h2>
 
         {/* AI Provider Toggle */}
         <div style={styles.section}>
@@ -478,7 +522,7 @@ ${fileContent}
                 background: useSharedKey ? '#28a745' : '#6c757d',
               }}
             >
-              {useSharedKey ? "✓ Using Stanley's Key" : "Use Stanley's Key"}
+              {useSharedKey ? "Using Stanley's Key" : "Use Stanley's Key"}
             </button>
           )}
         </div>
@@ -541,145 +585,68 @@ ${fileContent}
               onClick={() => setShowPromptModal(true)}
               style={{ ...styles.button, marginTop: '8px', background: '#6c757d' }}
             >
-              Show Prompt
+              View Role Prompt
             </button>
           )}
         </div>
 
-        {/* File Selection Dropdown */}
+        {/* Add Material */}
         <div style={styles.section}>
-          <label style={styles.label}>Select Report:</label>
-          <select
-            value={selectedFile}
-            onChange={(e) => setSelectedFile(e.target.value)}
-            style={styles.select}
-            disabled={isLoadingFiles}
-          >
-            <option value="">-- Select a file --</option>
-            {preloadedFiles.map((filename) => (
-              <option key={filename} value={filename}>
-                {filename}
-              </option>
-            ))}
-          </select>
-
-          {/* Navigation buttons */}
-          <div style={styles.navButtons}>
-            <button
-              onClick={() => navigateReport('prev')}
-              style={styles.navBtn}
-              disabled={preloadedFiles.length === 0}
-              title="Previous report"
-            >
-              ◀ Prev
-            </button>
-            <span style={styles.navCounter}>
-              {selectedFile ? `${preloadedFiles.indexOf(selectedFile) + 1}/${preloadedFiles.length}` : `0/${preloadedFiles.length}`}
-            </span>
-            <button
-              onClick={() => navigateReport('next')}
-              style={styles.navBtn}
-              disabled={preloadedFiles.length === 0}
-              title="Next report"
-            >
-              Next ▶
-            </button>
-          </div>
-
-          {/* Hidden folder input */}
-          <input
-            type="file"
-            ref={folderInputRef}
-            onChange={handleFolderSelect}
-            style={{ display: 'none' }}
-            webkitdirectory=""
-            directory=""
-            multiple
-          />
-
-          {/* Load Folder Button */}
+          <label style={styles.label}>Your Material:</label>
           <button
-            onClick={() => folderInputRef.current?.click()}
-            style={{ ...styles.button, marginTop: '8px', background: '#28a745' }}
-            disabled={isLoadingFiles}
+            onClick={() => setShowMaterialModal(true)}
+            style={{
+              ...styles.button,
+              background: userMaterial.trim() ? '#28a745' : '#4da6ff',
+            }}
           >
-            {isLoadingFiles ? 'Loading...' : '📂 Load Folder'}
+            {userMaterial.trim() ? `Material Added (${userMaterial.length} chars)` : 'Add Material'}
           </button>
-
-          {isLoadingFiles && (
-            <p style={styles.charCount}>Loading...</p>
+          {userMaterial.trim() && (
+            <button
+              onClick={() => setUserMaterial('')}
+              style={{ ...styles.button, marginTop: '8px', background: '#dc3545' }}
+            >
+              Clear Material
+            </button>
           )}
         </div>
 
-        {/* Send Mode Toggle */}
+        {/* Clear Chat */}
         <div style={styles.section}>
-          <label style={styles.label}>Send to Chat:</label>
-          <div style={styles.toggleContainer}>
-            <span style={{ fontSize: '12px', color: !sendAllFiles ? '#4da6ff' : '#888', fontWeight: !sendAllFiles ? 'bold' : 'normal' }}>
-              📄 Current
-            </span>
-            <div
-              onClick={() => setSendAllFiles(!sendAllFiles)}
-              style={{
-                ...styles.sliderTrack,
-                backgroundColor: sendAllFiles ? '#4da6ff' : '#6c757d',
-              }}
-            >
-              <div
-                style={{
-                  ...styles.sliderKnob,
-                  transform: sendAllFiles ? 'translateX(22px)' : 'translateX(0)',
-                }}
-              />
-            </div>
-            <span style={{ fontSize: '12px', color: sendAllFiles ? '#4da6ff' : '#888', fontWeight: sendAllFiles ? 'bold' : 'normal' }}>
-              📚 All Files
-            </span>
-          </div>
-          <p style={styles.charCount}>
-            {sendAllFiles
-              ? `Sending all ${Object.keys(allFileContents).length} files`
-              : selectedFile ? `Sending: ${selectedFile}` : 'No file selected'}
-          </p>
+          <button
+            onClick={clearChat}
+            style={{ ...styles.button, background: '#6c757d' }}
+            disabled={messages.length === 0}
+          >
+            Clear Chat
+          </button>
         </div>
       </div>
 
-      {/* Main Area - Side by Side */}
+      {/* Main Chat Area */}
       <div style={styles.mainArea}>
-        {/* File Content Panel (Left) */}
-        <div style={styles.filePanel}>
-          <div style={styles.filePanelHeader}>
-            {selectedFile || 'No file selected'}
-          </div>
-          <div style={styles.filePanelContent}>
-            {fileContent ? (
-              isMarkdown(selectedFile) ? (
-                <div
-                  style={styles.markdownContent}
-                  dangerouslySetInnerHTML={{ __html: renderMarkdown(fileContent) }}
-                />
-              ) : (
-                <pre style={styles.preContent}>{fileContent}</pre>
-              )
-            ) : (
-              <div style={styles.emptyState}>
-                <p>Select a file from the dropdown to view its contents</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Chat Panel (Right) */}
         <div style={styles.chatPanel}>
           <div style={styles.chatPanelHeader}>
-            Chat with {aiProvider === 'ChatGPT' ? 'ChatGPT' : 'Claude'}
+            <span>Chat with {aiProvider === 'ChatGPT' ? 'ChatGPT' : 'Claude'}</span>
+            {selectedRole !== 'default' && (
+              <span style={styles.roleIndicator}>Role: {roles[selectedRole]?.name}</span>
+            )}
           </div>
 
           {/* Chat Messages */}
           <div ref={chatContainerRef} style={styles.chatContainer}>
             {messages.length === 0 ? (
               <div style={styles.emptyState}>
-                <p>Select a file and start chatting!</p>
+                <p style={styles.emptyTitle}>Start a conversation</p>
+                <p style={styles.emptySubtitle}>
+                  {selectedRole !== 'default'
+                    ? `Using "${roles[selectedRole]?.name}" role`
+                    : 'Select a role or just start chatting'}
+                </p>
+                {userMaterial.trim() && (
+                  <p style={styles.emptySubtitle}>Material loaded ({userMaterial.length} characters)</p>
+                )}
               </div>
             ) : (
               messages.map((msg, index) => (
@@ -741,11 +708,40 @@ ${fileContent}
                 onClick={() => setShowPromptModal(false)}
                 style={styles.modalCloseBtn}
               >
-                OK
+                Close
               </button>
             </div>
             <div style={styles.modalContent}>
               <pre style={styles.promptText}>{roles[selectedRole]?.prompt}</pre>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Material Modal */}
+      {showMaterialModal && (
+        <div style={styles.modalOverlay} onClick={() => setShowMaterialModal(false)}>
+          <div style={styles.materialModal} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h3 style={styles.modalTitle}>Add Your Material</h3>
+              <button
+                onClick={() => setShowMaterialModal(false)}
+                style={styles.modalCloseBtn}
+              >
+                Done
+              </button>
+            </div>
+            <div style={styles.materialModalContent}>
+              <p style={styles.materialHint}>
+                Paste any text, notes, or content you want the AI to reference during your conversation.
+              </p>
+              <textarea
+                value={userMaterial}
+                onChange={(e) => setUserMaterial(e.target.value)}
+                placeholder="Paste your material here..."
+                style={styles.materialTextarea}
+              />
+              <p style={styles.charCount}>{userMaterial.length} characters</p>
             </div>
           </div>
         </div>
@@ -813,57 +809,6 @@ const styles = {
     color: '#fff',
     cursor: 'pointer',
   },
-  toggleContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    padding: '8px',
-    background: '#2d2d44',
-    borderRadius: '6px',
-  },
-  sliderTrack: {
-    position: 'relative',
-    width: '44px',
-    height: '22px',
-    borderRadius: '22px',
-    cursor: 'pointer',
-    transition: 'background-color 0.3s',
-  },
-  sliderKnob: {
-    position: 'absolute',
-    top: '2px',
-    left: '2px',
-    width: '18px',
-    height: '18px',
-    borderRadius: '50%',
-    backgroundColor: '#fff',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
-    transition: 'transform 0.3s',
-  },
-  navButtons: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    marginTop: '8px',
-  },
-  navBtn: {
-    flex: 1,
-    padding: '8px 12px',
-    borderRadius: '6px',
-    border: 'none',
-    fontSize: '12px',
-    fontWeight: '500',
-    background: '#2d2d44',
-    color: '#fff',
-    cursor: 'pointer',
-    transition: 'background 0.2s',
-  },
-  navCounter: {
-    fontSize: '12px',
-    color: '#888',
-    minWidth: '50px',
-    textAlign: 'center',
-  },
   checkbox: {
     width: '18px',
     height: '18px',
@@ -912,32 +857,8 @@ const styles = {
     display: 'flex',
     overflow: 'hidden',
   },
-  filePanel: {
-    width: '50%',
-    minWidth: '50%',
-    maxWidth: '50%',
-    display: 'flex',
-    flexDirection: 'column',
-    borderRight: '1px solid #ddd',
-    background: '#fff',
-  },
-  filePanelHeader: {
-    padding: '15px 20px',
-    background: '#1a1a2e',
-    color: '#4da6ff',
-    fontSize: '14px',
-    fontWeight: '600',
-    borderBottom: '1px solid #333',
-  },
-  filePanelContent: {
-    flex: 1,
-    overflowY: 'auto',
-    padding: '20px',
-  },
   chatPanel: {
-    width: '50%',
-    minWidth: '50%',
-    maxWidth: '50%',
+    flex: 1,
     display: 'flex',
     flexDirection: 'column',
     background: '#fff',
@@ -949,6 +870,16 @@ const styles = {
     fontSize: '14px',
     fontWeight: '600',
     borderBottom: '1px solid #333',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  roleIndicator: {
+    fontSize: '12px',
+    color: '#888',
+    background: '#2d2d44',
+    padding: '4px 10px',
+    borderRadius: '12px',
   },
   chatContainer: {
     flex: 1,
@@ -965,6 +896,16 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     color: '#666',
+  },
+  emptyTitle: {
+    fontSize: '18px',
+    fontWeight: '600',
+    margin: '0 0 8px 0',
+  },
+  emptySubtitle: {
+    fontSize: '14px',
+    margin: '4px 0',
+    color: '#888',
   },
   message: {
     padding: '12px 16px',
@@ -1021,20 +962,6 @@ const styles = {
     cursor: 'pointer',
     alignSelf: 'flex-end',
   },
-  markdownContent: {
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif",
-    lineHeight: '1.6',
-    color: '#333',
-  },
-  preContent: {
-    whiteSpace: 'pre-wrap',
-    wordWrap: 'break-word',
-    margin: 0,
-    fontFamily: "'Courier New', monospace",
-    fontSize: '14px',
-    lineHeight: '1.6',
-    color: '#333',
-  },
   modalOverlay: {
     position: 'fixed',
     top: 0,
@@ -1050,11 +977,22 @@ const styles = {
   modal: {
     background: '#fff',
     borderRadius: '12px',
-    width: '600px',
+    width: '700px',
     maxWidth: '90%',
     maxHeight: '80vh',
     display: 'flex',
     flexDirection: 'column',
+    overflow: 'hidden',
+  },
+  materialModal: {
+    background: '#fff',
+    borderRadius: '12px',
+    width: '700px',
+    maxWidth: '90%',
+    height: '70vh',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
   },
   modalHeader: {
     display: 'flex',
@@ -1085,6 +1023,28 @@ const styles = {
     flex: 1,
     overflowY: 'auto',
     padding: '20px',
+  },
+  materialModalContent: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '20px',
+    overflow: 'hidden',
+  },
+  materialHint: {
+    fontSize: '14px',
+    color: '#666',
+    margin: '0 0 12px 0',
+  },
+  materialTextarea: {
+    flex: 1,
+    padding: '12px',
+    borderRadius: '8px',
+    border: '1px solid #ddd',
+    fontSize: '14px',
+    resize: 'none',
+    fontFamily: 'inherit',
+    lineHeight: '1.5',
   },
   promptText: {
     whiteSpace: 'pre-wrap',
