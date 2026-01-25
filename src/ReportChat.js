@@ -998,7 +998,7 @@ const styles = {
     flex: 1,
     overflowY: 'auto',
     padding: '20px',
-    paddingBottom: '120px',
+    paddingBottom: '80px',
     display: 'flex',
     flexDirection: 'column',
     gap: '16px',
