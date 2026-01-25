@@ -47,6 +47,9 @@ const ReportChat = () => {
   // Refs
   const chatContainerRef = useRef(null);
 
+  // Sidebar state - hidden by default on mobile
+  const [showSidebar, setShowSidebar] = useState(window.innerWidth >= 768);
+
   // Available roles
   const roles = {
     'default': { name: 'Default (No Role)', prompt: null },
@@ -490,9 +493,27 @@ ${userMaterial}
 
   return (
     <div style={styles.container}>
+      {/* Sidebar backdrop for mobile */}
+      {showSidebar && window.innerWidth < 768 && (
+        <div
+          style={styles.sidebarBackdrop}
+          onClick={() => setShowSidebar(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <div style={styles.sidebar}>
-        <h2 style={styles.sidebarTitle}>Role Chat</h2>
+      {showSidebar && (
+        <div style={{
+          ...styles.sidebar,
+          ...(window.innerWidth < 768 ? styles.sidebarMobile : {}),
+        }}>
+          <button
+            onClick={() => setShowSidebar(false)}
+            style={styles.sidebarCloseBtn}
+          >
+            ×
+          </button>
+          <h2 style={styles.sidebarTitle}>Role Chat</h2>
 
         {/* AI Provider Toggle */}
         <div style={styles.section}>
@@ -633,15 +654,42 @@ ${userMaterial}
             Clear Chat
           </button>
         </div>
-      </div>
+        </div>
+      )}
 
       {/* Main Chat Area */}
       <div style={styles.mainArea}>
         <div style={styles.chatPanel}>
           <div style={styles.chatPanelHeader}>
+            {!showSidebar && (
+              <button
+                onClick={() => setShowSidebar(true)}
+                style={styles.hamburgerBtn}
+              >
+                ☰
+              </button>
+            )}
             <span>Chat with {aiProvider === 'ChatGPT' ? 'ChatGPT' : 'Claude'}</span>
             {selectedRole !== 'default' && (
               <span style={styles.roleIndicator}>Role: {roles[selectedRole]?.name}</span>
+            )}
+            {!showSidebar && aiProvider === 'ChatGPT' && (
+              <button
+                onClick={() => {
+                  const code = prompt("Enter access code for Stanley's key:");
+                  if (code) {
+                    setAccessCode(code);
+                    setUseSharedKey(true);
+                    setApiKey('');
+                  }
+                }}
+                style={{
+                  ...styles.stanleyKeyBtn,
+                  background: useSharedKey ? '#28a745' : '#4da6ff',
+                }}
+              >
+                {useSharedKey ? "✓ Stanley's Key" : "Use Stanley's Key"}
+              </button>
             )}
           </div>
 
@@ -779,6 +827,38 @@ const styles = {
     gap: '16px',
     overflowY: 'auto',
     flexShrink: 0,
+    position: 'relative',
+  },
+  sidebarMobile: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    height: '100vh',
+    width: '85%',
+    maxWidth: '320px',
+    zIndex: 1000,
+    boxShadow: '2px 0 10px rgba(0,0,0,0.3)',
+  },
+  sidebarBackdrop: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'rgba(0,0,0,0.5)',
+    zIndex: 999,
+  },
+  sidebarCloseBtn: {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    background: 'none',
+    border: 'none',
+    color: '#888',
+    fontSize: '28px',
+    cursor: 'pointer',
+    padding: '0 8px',
+    lineHeight: 1,
   },
   sidebarTitle: {
     margin: '0 0 10px 0',
@@ -882,8 +962,27 @@ const styles = {
     fontWeight: '600',
     borderBottom: '1px solid #333',
     display: 'flex',
-    justifyContent: 'space-between',
+    gap: '12px',
     alignItems: 'center',
+  },
+  hamburgerBtn: {
+    background: 'none',
+    border: 'none',
+    color: '#4da6ff',
+    fontSize: '22px',
+    cursor: 'pointer',
+    padding: '0',
+  },
+  stanleyKeyBtn: {
+    marginLeft: 'auto',
+    padding: '6px 12px',
+    borderRadius: '6px',
+    border: 'none',
+    fontSize: '12px',
+    fontWeight: '500',
+    color: '#fff',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
   },
   roleIndicator: {
     fontSize: '12px',
