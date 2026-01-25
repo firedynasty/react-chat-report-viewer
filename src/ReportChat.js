@@ -30,7 +30,7 @@ const ReportChat = () => {
   const [webSearchEnabled, setWebSearchEnabled] = useState(false);
   const [useSharedKey, setUseSharedKey] = useState(false);
   const [accessCode, setAccessCode] = useState('');
-  const [selectedRole, setSelectedRole] = useState('default');
+  const [selectedRole, setSelectedRole] = useState('pride_prejudice_teacher');
 
   // User material state
   const [userMaterial, setUserMaterial] = useState('');
